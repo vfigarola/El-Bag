@@ -118,25 +118,18 @@ for i = 1:length(included_subj)
     trig_time_ax_subj = [trig_time_ax_subj analysis.(new_field_name).time_btw_trigs];
 end
 
-%% Let's find the pupil peak 
+%% TO DO: Let's find the pupil peak & time to peak / slope
 %+1 50ms around peak, then average window
 
 
 
 %% let's shade the area where the audio is being played
-
 t_anech = linspace(-1000,length(anech_pupil_uninter_avg),length(anech_pupil_uninter_avg));
 t_reverb = linspace(-1000,length(reverb_pupil_uninter_avg),length(reverb_pupil_uninter_avg));
 
 fs_stream = 44100;
 t_anech_audio = 0:1/fs_stream:(246650-1)/fs_stream;
 t_reverb_audio = 0:1/fs_stream:(324132-1)/fs_stream;
-
-%% let's also align when the interrupter comes on 
-% interval = floor(0.3*fs_stream); %syllables occur every 300ms
-% onset_to_onset = 0.6;
-% target_onset_times = [1,onset_to_onset,2*onset_to_onset,3*onset_to_onset]; %0=cue, t_T1=first target syll
-% inter_onset = target_onset_times(1) + 0.475;
 
 stream_onsets = [max(mean(trig_time_ax_subj)) (max(mean(trig_time_ax_subj)+0.6)) (max(mean(trig_time_ax_subj))+0.6+0.475)];
     %cue, syllable 1, interrupter
@@ -151,7 +144,6 @@ sgtitle(['Pupil Area (n=' num2str(length(included_subj)) ')'],'FontSize',16,'Fon
 a_uninter = shadedErrorBar(t_anech/1000,mean(anech_pupil_uninter_avg),std(anech_pupil_uninter_avg)/sqrt(length(included_subj)),'lineProps','k');
 hold on
 a_uninter.mainLine.LineWidth = 1.5;
-% a_uninter.mainLine.Color = [0.6 0.6 1];
 
 a_inter = shadedErrorBar(t_anech/1000,mean(anech_pupil_inter_avg),std(anech_pupil_inter_avg)/sqrt(length(included_subj)),'lineProps','g');
 a_inter.mainLine.LineWidth = 1.5;
@@ -159,14 +151,10 @@ a_inter.mainLine.LineWidth = 1.5;
 xline(stream_onsets(1),'--k','Cue','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(2),'--k','Stream','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(3),'--b','Interrupter','LineWidth',1.5,'FontWeight','bold','LabelVerticalAlignment','top','LabelHorizontalAlignment','center')
-% xline(max(t_anech_audio),'--k','End Trial Stream','LineWidth',1.5,'FontWeight','bold')
 rectangle(Position=[max(mean(trig_time_ax_subj)),-10,max(t_anech_audio),2], FaceColor=[0.8 0.8 0.8], EdgeColor=[0.7 0.7 0.7])
 
-% ylim([900 1800])
 xlim([-0.5 8])
 set(gca,'FontSize',14,'FontWeight','bold');
-% xlabel('Time (sec)')
-% ylabel('Pupil Area (z)')
 title('Anechoic')
 
 subplot(2,1,2)
@@ -180,14 +168,11 @@ r_inter.mainLine.LineWidth = 1.5;
 xline(stream_onsets(1),'--k','Cue','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(2),'--k','Stream','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(3),'--b','Interrupter','LineWidth',1.5,'FontWeight','bold','LabelVerticalAlignment','top','LabelHorizontalAlignment','center')
-% xline(max(t_reverb_audio),'--k','End Trial Stream','LineWidth',1.5,'FontWeight','bold')
 rectangle(Position=[max(mean(trig_time_ax_subj)),-10,max(t_reverb_audio),2], FaceColor=[0.5020 0.5020 0.5020], EdgeColor=[0.7 0.7 0.7])
 
-% ylim([900 1800])
 xlim([-0.5 8])
 set(gca,'FontSize',14,'FontWeight','bold');
 legend('Uninter','Inter')
-% xlabel('Time (sec)')
 title('Reverb')
 
 han=axes(fig1,'visible','off','FontSize',14,'FontWeight','bold'); 
@@ -208,20 +193,13 @@ a_uninter.mainLine.LineWidth = 1.5;
 r_uninter = shadedErrorBar(t_reverb/1000,mean(reverb_pupil_uninter_avg),std(reverb_pupil_uninter_avg)/sqrt(length(included_subj)),'lineProps','b');
 r_uninter.mainLine.LineWidth = 1.5;
 
-% xline(mean(trig_time_ax_subj),'--k','Stream Onset','LineWidth',1.5,'FontWeight','bold')
-% xline(max(t_reverb_audio),'--k','End Reverb Stream','LineWidth',1.5,'FontWeight','bold')
-% xline(max(t_anech_audio),'--k','End Anech Stream','LineWidth',1.5,'FontWeight','bold')
 xline(stream_onsets(1),'--k','Cue','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(2),'--k','Stream','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 rectangle(Position=[max(mean(trig_time_ax_subj)),-8,max(t_anech_audio),2], FaceColor=[255 204 204]/255, EdgeColor=[0.7 0.7 0.7])
 rectangle(Position=[max(mean(trig_time_ax_subj)),-10,max(t_reverb_audio),2], FaceColor=[204 229 255]/255, EdgeColor=[0.7 0.7 0.7])
 
-% ylim([900 1800])
 xlim([-0.5 8])
-
 set(gca,'FontSize',14,'FontWeight','bold');
-% xlabel('Time (sec)')
-% ylabel('Pupil Area (z)')
 title('Uninterrupted')
 
 subplot(2,1,2)
@@ -232,21 +210,15 @@ a_inter.mainLine.LineWidth = 1.5;
 r_inter = shadedErrorBar(t_reverb/1000,mean(reverb_pupil_inter_avg),std(reverb_pupil_inter_avg)/sqrt(length(included_subj)),'lineProps','b');
 r_inter.mainLine.LineWidth = 1.5;
 
-% xline(mean(trig_time_ax_subj),'--k','Stream Onset','LineWidth',1.5,'FontWeight','bold')
-% xline(max(t_reverb_audio),'--k','End Reverb Stream','LineWidth',1.5,'FontWeight','bold')
-% xline(max(t_anech_audio),'--k','End Anech Stream','LineWidth',1.5,'FontWeight','bold')
 xline(stream_onsets(1),'--k','Cue','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(2),'--k','Stream','LineWidth',1.5,'FontWeight','bold','LabelHorizontalAlignment','center')
 xline(stream_onsets(3),'--b','Interrupter','LineWidth',1.5,'FontWeight','bold','LabelVerticalAlignment','top','LabelHorizontalAlignment','center')
 rectangle(Position=[max(mean(trig_time_ax_subj)),-8,max(t_anech_audio),2], FaceColor=[255 204 204]/255, EdgeColor=[0.7 0.7 0.7])
 rectangle(Position=[max(mean(trig_time_ax_subj)),-10,max(t_reverb_audio),2], FaceColor=[204 229 255]/255, EdgeColor=[0.7 0.7 0.7])
 
-% ylim([900 1800])
 xlim([-0.5 8])
-
 set(gca,'FontSize',14,'FontWeight','bold');
 legend('Anechoic','Reverb')
-% xlabel('Time (sec)')
 title('Interrupted')
 
 han=axes(fig2,'visible','off','FontSize',14,'FontWeight','bold'); 
@@ -254,7 +226,6 @@ han.XLabel.Visible='on';
 han.YLabel.Visible='on';
 ylabel(han,'Pupil Dilation (z)');
 xlabel(han,'Time (sec)');
-%% 
 
 
 
