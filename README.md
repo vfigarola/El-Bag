@@ -5,5 +5,7 @@ Laboratory studies of attention often utilize anechoic listening conditions that
 
 Similar to Experiment 1, <b> Experiment 2 </b> investigates reverberation’s effect on selective spatial attention, measuring pupillometry to study how the neural signatures of spatial attention, and specifically, the cognitive effort to selectively attend, are impacted by reverberation.
 
+# Scripts Overview
+
 
 
