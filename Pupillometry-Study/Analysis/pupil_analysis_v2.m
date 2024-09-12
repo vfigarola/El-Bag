@@ -1,9 +1,10 @@
 %% Victoria Figarola
-
-%% INPUTS
+%200ms prestim baseline
+% 1 sec past end -- task evoked
+% end of trial -- response
 
 %%
-function analysis = pupil_analysis_v2(subj_ID,data,behavioral_data,events,N_TotalTrials,N_EnvTrials,fs,preStim_baseline,preBlink,postBlink,fc,N_samples_anech,N_samples_reverb)
+function analysis = pupil_analysis_v2(subj_ID,data,behavioral_data,events,N_TotalTrials,N_EnvTrials,fs,preStim_baseline,preBlink,postBlink,fc,N_samples_anech,N_samples_reverb,period)
 
 analysis = struct();
 
@@ -11,22 +12,15 @@ analysis = struct();
 data_find_nan = find(isnan(data.Var1));
 data(data_find_nan,:) = [];
 
-%% Let's grab that dynamic range info
-N_dynamic_range_trials = 3;
-[white_raw_dynamic_range_data,black_raw_dynamic_range_data ] = grab_pupil_reactivity_data(N_TotalTrials,events,data,fs,N_dynamic_range_trials,preBlink,postBlink,subj_ID,fc);
-
-% now, we're going to start at 2000 and end at 8000 (~6 sec long)
-for i = 1:N_dynamic_range_trials
-    white_raw_dynamic_range_data_proc = white_raw_dynamic_range_data{i,4};
-    white_raw_dynamic_range_data_final(i,:) = white_raw_dynamic_range_data_proc(1500:8500-1,:);
-
-    black_raw_dynamic_range_data_proc = black_raw_dynamic_range_data{i,4};
-    black_raw_dynamic_range_data_final(i,:) = black_raw_dynamic_range_data_proc(1500:8500-1,:);
+%% TASK EVOKED PERIOD: Let's first import all the data and find the trial onsets during 
+if strcmp(period,"task")
+    [trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= time_trial_indices(N_TotalTrials,events,preStim_baseline,data);
+elseif strcmp(period,"response")
+    [trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= reponse_trial_indices(N_TotalTrials,events,data,preStim_baseline,"response");
+elseif strcmp(period,"trial")
+    [trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= reponse_trial_indices(N_TotalTrials,events,data,preStim_baseline,"trial");
 end
 
-
-%% Let's first import all the data and find the trial onsets
-[trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= time_trial_indices(N_TotalTrials,events,preStim_baseline,data);
 
 raw_trial_data = cell(N_TotalTrials,1);
 for i = 1:N_TotalTrials
@@ -67,7 +61,7 @@ blink_time_idx = find_blinks(events,trialid_idx,preBlink,postBlink,time_stamps,t
 blink_count(empty_trials_idx,:) = NaN;
 
 %% let's interpolate those blinks!
-raw_trial_data = interpolate_data(subj_ID,raw_trial_data,time_idx,data_col,time_stamps,blink_time_idx);
+raw_trial_data = interpolate_data(subj_ID, period,raw_trial_data,time_idx,data_col,time_stamps,blink_time_idx);
 
 for i = 1:N_TotalTrials
     if isempty(raw_trial_data{i, 2})
@@ -97,6 +91,8 @@ if ~isempty(total_trials_excluded)
     reverb_pupil_inter = exclude_trials(total_trials_excluded,trial_info.reverb_inter,reverb_pupil_inter,1);
 end
 
+%% let's quickly update the blink_count array
+% to account for all excluded trials
 
 %% Let's see how many trials were excluded after all
 if length(total_trials_excluded) >= N_EnvTrials %greater than 50% of data, we are going to exclude participant
@@ -144,8 +140,6 @@ else
     blink_count_table(:,2:3) = [];
 
     %%%%%%%%%%%% SAVE EVERYTHING
-    analysis.white_raw_dynamic_range_data = white_raw_dynamic_range_data_final;
-    analysis.black_raw_dynamic_range_data = black_raw_dynamic_range_data_final;
     analysis.excluded = "included";
     analysis.blink_info = struct();
     analysis.blink_info.blink_time_idx = blink_time_idx;
@@ -163,14 +157,3 @@ else
     analysis.time_btw_trigs = trial_sync_trig_diff;
 
 end
-
-% toc;
-
-
-
-
-
-
-
-
-
