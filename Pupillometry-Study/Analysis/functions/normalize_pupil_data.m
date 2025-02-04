@@ -4,10 +4,10 @@
 % variance of the baseline period 
 % the baseline period is 200ms before the onset of the cue 
 
-function [uninter_data_norm,inter_data_norm,baseline_period_avg] = normalize_pupil_data(fs,N_EnvTrials,uninter_data,inter_data,N_samples)
+function [uninter_data_norm,inter_data_norm,baseline_period_avg] = normalize_pupil_data(fs,N_EnvTrials,uninter_data,inter_data)
 % get time_btw_trigs 
 % N_samples = N_samples_anech;
-
+N_samples = size(inter_data,1);
 t = 0:1/fs:(N_samples-1)/fs;
 t = t - 1;
 

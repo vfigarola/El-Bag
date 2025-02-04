@@ -14,6 +14,7 @@ trig_time_ax_subj = [];
 for i = 1:length(included_subj)
     new_field_name = append("P",included_subj(i));
     trig_time_ax_subj = [trig_time_ax_subj task_analysis.(new_field_name).time_btw_trigs];
+    
 end
 
 output = struct();

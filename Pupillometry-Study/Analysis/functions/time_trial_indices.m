@@ -1,7 +1,14 @@
 %% Victoria Figarola
 % This function outputs the indices of: trial start time, synctime, 
 
-function [trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= time_trial_indices(N_TotalTrials,events,preStim_baseline,data)
+function [trialid_idx,time_stamps,time_idx,synctime_start_time_idx]= time_trial_indices(subj_ID,N_TotalTrials,events,preStim_baseline,data,end_samples)
+
+if subj_ID == "051"
+    idx_to_remove = [12755,12756,12797,12798];
+    for j = 1:length(idx_to_remove)
+        events(idx_to_remove(j)).message = [];
+    end
+end
 
 trialid_idx=[];
 for i = 1:N_TotalTrials
@@ -28,15 +35,16 @@ end
 % trial_idx = [trialid_idx trialid_end_idx];
 
 st_time = [];
-end_time = [];
+% end_time = [];
 for i = 1:length(trialid_idx)
     st_time = [st_time;events(trialid_idx(i)).sttime];
-    end_time = [end_time;events(trialid_end_idx(i)).sttime];
+    % end_time = [end_time;events(trialid_end_idx(i)).sttime];
 end
 
 st_time = double(st_time);
 st_time = st_time - preStim_baseline;
-end_time = double(end_time);
+end_time = st_time + (end_samples-1); %8.2 seconds 
+% end_time = double(end_time);
 time_stamps = double(data.Var1); %in ms
 
 time_idx = zeros(N_TotalTrials,2);

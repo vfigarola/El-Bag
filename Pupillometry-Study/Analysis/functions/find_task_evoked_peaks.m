@@ -1,5 +1,6 @@
 %% Victoria Figarola
-% This function finds the average task evoked peak PD
+% This function finds the average task evoked peak PD between 3 and 6
+% seconds
 
 
 function output = find_task_evoked_peaks(included_subj,data,t,pre_peak_baseline,pk_condition)
